@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InterviewIQ — Real-Time Multimodal AI Mock Interviewer</title>
+  <meta name="description" content="InterviewIQ is an offline-ready, real-time AI mock interviewer featuring live OpenCV computer vision analysis, posture tracking, speech pace evaluation, and evidence-based reports.">
+  <meta name="keywords" content="mock interview, AI interview, OpenCV, MediaPipe, computer vision, speech analysis, real-time coaching">
+
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Design System & Micro-Animations -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/animations.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-icon-box">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="22"></line>
+        </svg>
+      </div>
+      <div class="brand-title">
+        Interview<span>IQ</span>
+        <span class="brand-badge">Live Vision</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div id="status-connection-pill" class="status-pill">
+        <div class="status-dot"></div>
+        <span class="status-text">Ready</span>
+      </div>
+
+      <div id="status-session-pill" class="status-pill" style="display: none;">
+        <div class="status-dot"></div>
+        <span class="status-text">Standby</span>
+      </div>
+
+      <button id="btn-theme-toggle" class="btn-icon" title="Toggle Theme" aria-label="Toggle Dark / Light Theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Application Body -->
+  <main>
+    <!-- ====================================================================
+         1. LANDING SCREEN
+         ==================================================================== -->
+    <section id="landing-screen" class="app-screen active">
+      <div class="landing-container animate-fade-in">
+        <div class="hero-pill">
+          <span>⚡ Real-Time Multimodal Assessment • 60-Second Coaching</span>
+        </div>
+
+        <h1 class="landing-title">
+          Master Your Next Interview with <br>
+          <span class="gradient-text">Real-Time Computer Vision & Speech Intelligence</span>
+        </h1>
+
+        <p class="landing-subtitle">
+          InterviewIQ uses Python OpenCV and MediaPipe to analyze real camera framing, head orientation,
+          and posture stability, while evaluating speaking pace, filler words, and answer structure—all processed locally with zero cloud API keys.
+        </p>
+
+        <!-- Category Selector -->
+        <div class="category-section">
+          <div class="section-label">Select Interview Category</div>
+          <div class="category-grid">
+            <div class="category-card selected" data-category="General">
+              <div class="category-icon">💼</div>
+              <div class="category-name">General</div>
+              <div class="category-desc">Career trajectory, core strengths, problem solving, and professional value.</div>
+            </div>
+
+            <div class="category-card" data-category="HR">
+              <div class="category-icon">🤝</div>
+              <div class="category-name">HR & Culture</div>
+              <div class="category-desc">Collaboration style, handling feedback, conflict resolution, and teamwork.</div>
+            </div>
+
+            <div class="category-card" data-category="Communication">
+              <div class="category-icon">🎙️</div>
+              <div class="category-name">Communication</div>
+              <div class="category-desc">Stakeholder influence, simplifying complex concepts, and articulation.</div>
+            </div>
+
+            <div class="category-card" data-category="Technical Fundamentals">
+              <div class="category-icon">⚡</div>
+              <div class="category-name">Technical Fundamentals</div>
+              <div class="category-desc">Software architecture, debugging strategies, code quality, and trade-offs.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hardware & Permissions Information Card -->
+        <div class="info-card">
+          <div class="info-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <div class="info-text">
+            <h4>Private & Local Hardware Access</h4>
+            <p>
+              Your browser will request camera and microphone permissions when you click <strong>Start Interview</strong>.
+              Video frames are processed in real time by the local OpenCV backend. No raw audio or video is stored or sent to any third-party cloud.
+            </p>
+          </div>
+        </div>
+
+        <!-- Primary Action CTA -->
+        <button id="btn-start-interview" class="btn-primary animate-pulse-glow">
+          <span>Start 60s Interview</span>
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         2. LIVE INTERVIEW WORKSPACE SCREEN
+         ==================================================================== -->
+    <section id="workspace-screen" class="app-screen">
+      <div class="workspace-grid">
+        <!-- Left Stage: Webcam & Real Computer Vision HUD -->
+        <div class="camera-stage">
+          <div class="camera-header">
+            <div class="camera-label">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+              <span>Live Webcam Feed</span>
+            </div>
+            <div class="live-indicator">
+              <div class="live-dot"></div>
+              <span>LIVE</span>
+            </div>
+          </div>
+
+          <div class="video-container">
+            <video id="webcam-video" autoplay playsinline muted></video>
+            <canvas id="overlay-canvas"></canvas>
+
+            <!-- Floating Live HUD Badges -->
+            <div class="camera-hud-badges">
+              <div id="hud-face-pill" class="hud-pill">Detecting Face...</div>
+              <div id="hud-framing-pill" class="hud-pill">Aligning Framing...</div>
+              <div id="hud-lighting-pill" class="hud-pill">Measuring Light...</div>
+              <div id="hud-posture-pill" class="hud-pill">Tracking Posture...</div>
+            </div>
+          </div>
+
+          <div class="camera-controls-bar">
+            <div class="telemetry-row">
+              <div class="telemetry-item">Framing: <span id="live-metric-framing">--</span></div>
+              <div class="telemetry-item">Pace: <span id="live-metric-wpm">-- WPM</span></div>
+              <div class="telemetry-item">Fillers: <span id="live-metric-fillers">0</span></div>
+            </div>
+            <button id="btn-end-interview" class="btn-sm" title="End interview and generate report immediately">
+              End Interview Early
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Stage: Interviewer, Countdown, Live Transcript -->
+        <div class="interaction-stage">
+          <!-- Authoritative 60-Second Countdown Card -->
+          <div id="countdown-card" class="countdown-card">
+            <div class="countdown-digits-wrapper">
+              <svg class="timer-circle-svg" viewBox="0 0 48 48">
+                <circle class="timer-circle-bg" cx="24" cy="24" r="22"></circle>
+                <circle id="timer-circle-progress" class="timer-circle-progress" cx="24" cy="24" r="22"></circle>
+              </svg>
+              <div class="countdown-info">
+                <div class="countdown-label">Authoritative Session Clock</div>
+                <div id="countdown-digits" class="countdown-digits">01:00</div>
+              </div>
+            </div>
+            <div class="session-category-badge" id="session-category-label">General</div>
+          </div>
+
+          <!-- Active Question Card -->
+          <div class="question-card">
+            <div class="interviewer-header">
+              <div class="interviewer-meta">
+                <div id="interviewer-state-indicator" class="interviewer-avatar" title="Interviewer">🗣️</div>
+                <div class="interviewer-title">Interviewer Question</div>
+              </div>
+              <button id="btn-replay-voice" class="btn-sm" title="Replay spoken question">
+                🔊 Replay Voice
+              </button>
+            </div>
+
+            <div id="current-question-text" class="question-text">
+              Tell me about yourself and what drives your professional work.
+            </div>
+
+            <div class="question-actions">
+              <button id="btn-next-question" class="btn-sm primary">
+                <span>I'm Done Answering / Next</span>
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Spoken Answer & Live Transcript Card -->
+          <div class="transcript-card">
+            <div class="transcript-header">
+              <div class="transcript-label">
+                <span>Live Spoken Transcript</span>
+                <div class="listening-pulse-container">
+                  <span class="listening-wave-bar"></span>
+                  <span class="listening-wave-bar"></span>
+                  <span class="listening-wave-bar"></span>
+                  <span class="listening-wave-bar"></span>
+                </div>
+              </div>
+            </div>
+
+            <div id="transcript-content" class="transcript-content">
+              <span class="transcript-placeholder">Listening for your spoken response...</span>
+            </div>
+
+            <!-- Fallback Manual Entry Input Box -->
+            <div id="manual-answer-container" class="manual-input-box" style="display: none;">
+              <input type="text" id="manual-answer-input" class="manual-input-field" placeholder="Type your answer here if speech recognition is unavailable...">
+              <button id="btn-submit-manual" class="btn-sm primary">Submit</button>
+            </div>
+          </div>
+
+          <!-- Live Metrics Grid -->
+          <div class="live-indicators-grid">
+            <div class="metric-pill-card">
+              <div class="metric-pill-label">Quality Weight</div>
+              <div class="metric-pill-value">35%</div>
+            </div>
+            <div class="metric-pill-card">
+              <div class="metric-pill-label">Verbal Weight</div>
+              <div class="metric-pill-value">25%</div>
+            </div>
+            <div class="metric-pill-card">
+              <div class="metric-pill-label">Camera Weight</div>
+              <div class="metric-pill-value">20%</div>
+            </div>
+            <div class="metric-pill-card">
+              <div class="metric-pill-label">Posture Weight</div>
+              <div class="metric-pill-value">20%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         3. FINAL ASSESSMENT REPORT SCREEN
+         ==================================================================== -->
+    <section id="report-screen" class="app-screen">
+      <div class="report-container animate-fade-in">
+        <!-- Banner & Overall Score Dial -->
+        <div class="report-banner">
+          <div class="score-dial-wrapper">
+            <div class="score-number-box">
+              <div id="report-score-num" class="score-number">--</div>
+              <div class="score-total">/ 100</div>
+            </div>
+            <div>
+              <h2 id="report-tier-title" class="tier-title">Computing Report...</h2>
+              <p id="report-summary-text" class="tier-summary">
+                Analyzing collected video frames, posture cues, verbal delivery, and answer structure...
+              </p>
+              <div id="report-coverage-badge" class="report-coverage-badge">
+                📊 Data Coverage: --%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Explainable Category Cards -->
+        <div>
+          <div class="section-label">Categorical Performance Breakdown</div>
+          <div id="report-categories-container" class="report-categories-grid">
+            <!-- Dynamically populated by report.js -->
+          </div>
+        </div>
+
+        <!-- Observed Strengths & Actionable Improvements -->
+        <div class="report-insights-grid">
+          <div class="insight-card">
+            <div class="insight-header">
+              <span>🌟 Observed Strengths (Evidence-Backed)</span>
+            </div>
+            <div id="report-strengths-list" class="insight-list"></div>
+          </div>
+
+          <div class="insight-card">
+            <div class="insight-header">
+              <span>🎯 Actionable Improvement Areas</span>
+            </div>
+            <div id="report-improvements-list" class="insight-list"></div>
+          </div>
+        </div>
+
+        <!-- Diagnostics Summary -->
+        <div class="report-insights-grid">
+          <div class="insight-card">
+            <div class="insight-header">🎙️ Verbal & Speech Diagnostics</div>
+            <div id="diag-speech-summary" class="insight-list" style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.6;"></div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-header">👁️ Computer Vision & Posture Diagnostics</div>
+            <div id="diag-vision-summary" class="insight-list" style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.6;"></div>
+          </div>
+        </div>
+
+        <!-- Personalized 3-Step Practice Plan -->
+        <div class="plan-section">
+          <div class="section-label">Personalized 3-Step Practice Plan</div>
+          <div id="report-plan-container" class="plan-steps-grid"></div>
+        </div>
+
+        <!-- Complete Q&A Transcript History -->
+        <div class="history-section">
+          <div class="section-label">Session Interview Transcript History</div>
+          <div id="report-history-container"></div>
+        </div>
+
+        <!-- Methodology & Ethical Disclaimer -->
+        <p class="disclaimer-note">
+          <strong>Methodology Notice:</strong> InterviewIQ provides communication coaching based solely on observable behaviors (camera framing, speaking pace, answer structure, and posture alignment). It does not infer internal emotion, deception, intelligence, or psychological traits.
+        </p>
+
+        <!-- Action Controls -->
+        <div class="report-actions-bar">
+          <button id="btn-download-json" class="btn-sm primary">
+            📥 Download Report (JSON)
+          </button>
+          <button id="btn-print-report" class="btn-sm">
+            🖨️ Print / Save PDF
+          </button>
+          <button id="btn-restart" class="btn-sm primary">
+            🔄 Start Fresh Interview
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Application Client Scripts -->
+  <script src="/static/js/websocket.js"></script>
+  <script src="/static/js/camera.js"></script>
+  <script src="/static/js/speech.js"></script>
+  <script src="/static/js/report.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
