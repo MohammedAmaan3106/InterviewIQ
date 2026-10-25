@@ -7,7 +7,6 @@ dependencies = [
   "uvicorn>=0.30.0,<1.0.0",
   "numpy>=2.0.0,<3.0.0",
   "opencv-python-headless>=4.10.0,<5.0.0",
-  "mediapipe>=0.10.14,<1.0.0",
   "pydantic>=2.9.0,<3.0.0",
   "starlette>=0.40.0,<1.0.0",
   "websockets>=12.0,<16.0"
